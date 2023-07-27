@@ -65,6 +65,13 @@ class Request(models.Model):
     books = models.ManyToManyField(Book)
     sent_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='send_to')
     send_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='send_by')
+    wait_status = models.BooleanField(default=False)
+    acceptt_status = models.BooleanField(default=False)
+    agree_status = models.BooleanField(default=False)
+    complete_status = models.BooleanField(default=False)
+    decline_status = models.BooleanField(default=False)
+    cancle_status = models.BooleanField(default=False)
+
     statuses =[
         ('wait', 'waiting'),
         ('accepted', 'accepted'),
