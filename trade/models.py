@@ -59,7 +59,7 @@ class Book(models.Model):
     
     class Meta:
         ordering = ['-title', 'owner']
-
+    
 
 class Request(models.Model):
     books = models.ManyToManyField(Book)
@@ -78,14 +78,6 @@ class Request(models.Model):
     def __str__(self) -> str:
         return self.books
 
-class Genre(models.Model):
-    title = models.CharField(max_length=60)
-
-    def __str__(self) -> str:
-        return self.title
-
-    class Meta:
-        ordering = ['-title']
 
 class Library(models.Model):
     books = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='books')
