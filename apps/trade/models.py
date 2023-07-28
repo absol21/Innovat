@@ -38,10 +38,11 @@ class Language(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='book_owner')
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='author')
     genre = models.ManyToManyField(Genre, related_name='genre')
     language = models.ForeignKey(Language, on_delete=models.CASCADE, related_name='languages')
+    is_available = models.BooleanField(default=True)
     statuses = [
         ('Б/у', 'Б/у'),
         ('Новый', 'Новый'),
