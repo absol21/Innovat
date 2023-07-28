@@ -72,16 +72,6 @@ class Request(models.Model):
     decline_status = models.BooleanField(default=False)
     cancle_status = models.BooleanField(default=False)
 
-    statuses =[
-        ('wait', 'waiting'),
-        ('accepted', 'accepted'),
-        ('agreed', 'agreed'),
-        ('completed', 'completed'),
-        ('declined', 'declined'),
-        ('canceled', 'canceled')
-    ]
-    status = models.CharField(max_length=10, choices=statuses)
-
     def __str__(self) -> str:
         return self.books
 
