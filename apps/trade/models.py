@@ -49,10 +49,9 @@ class Book(models.Model):
     ]
     status = models.CharField(max_length=5, choices=statuses)
     image = models.ImageField(
-        upload_to=get_path_upload_avatar,
+        upload_to='book-images/',
         blank=True,
         null=True,
-        validators=[FileExtensionValidator(allowed_extensions=['jpg']), validate_image_size]
     )
 
     def __str__(self) -> str:
@@ -63,23 +62,18 @@ class Book(models.Model):
     
 
 class Request(models.Model):
-    books = models.ManyToManyField(Book)
+    sent_books = models.ManyToManyField(Book, related_name='sent_books')
+    requested_books = models.ManyToManyField(Book, related_name='requsted_books')
     sent_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='send_to')
     send_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='send_by')
-    wait_status = models.BooleanField(default=False)
-    acceptt_status = models.BooleanField(default=False)
-    agree_status = models.BooleanField(default=False)
-    complete_status = models.BooleanField(default=False)
-    decline_status = models.BooleanField(default=False)
-    cancle_status = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_waiting = models.BooleanField(default=False)
+    is_accepted = models.BooleanField(default=False)
+    is_agreed = models.BooleanField(default=False)
+    is_completed = models.BooleanField(default=False)
+    is_declined = models.BooleanField(default=False)
+    is_canceled = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.books
 
-
-class Library(models.Model):
-    books = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='books')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
-
-    def __str__(self) -> str:
-        return self.books
