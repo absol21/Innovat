@@ -10,7 +10,7 @@ class BookSerializer(serializers.ModelSerializer):
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Author
-        fiellds = '__all__'
+        fields = ('name',)
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -24,3 +24,5 @@ class RequestSeializer(serializers.ModelSerializer):
         model = models.Request
         fields = '__all__'
 
+# class RequestSerializer(serializers.Serializer):
+#     requester = serializers.CharField()
