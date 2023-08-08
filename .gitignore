@@ -177,4 +177,4 @@ media/
 image/
 audio/
 # __pycache__/
-migrations/
+# migrations/
