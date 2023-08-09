@@ -87,13 +87,27 @@ class AddBookSerializer(serializers.ModelSerializer):
             book.genre.add(i)
         
         return book
+    
 
+
+class SentBooksPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        current_user = self.context['request'].user
+        queryset = super().get_queryset()
+        return queryset.filter(owner=current_user)
+    
+
+class RequestedBooksPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        current_object = self.context['view'].get_object()
+        queryset = super().get_queryset()
+        return queryset.filter(owner=current_object)
 
 
 class SendRequestSerializer(serializers.ModelSerializer):
     send_to = UserSerializer(read_only=True)
-    sent_books = serializers.PrimaryKeyRelatedField(many=True, queryset=Book.objects.all())
-    requested_books = serializers.PrimaryKeyRelatedField(many=True, queryset=Book.objects.all())
+    sent_books = SentBooksPrimaryKeyRelatedField(many=True, queryset=Book.objects.all())
+    requested_books = RequestedBooksPrimaryKeyRelatedField(many=True, queryset=Book.objects.all())
 
     class Meta:
         model = Request
