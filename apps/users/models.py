@@ -29,15 +29,15 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser):
-    username = None
+    username = models.CharField(max_length=60)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=12, blank=True, null=True)
-    location = models.CharField(max_length=60, blank=True, null=True)
+    location = models.CharField(max_length=60,)
     avatar = models.ImageField(
         upload_to=get_path_upload_avatar,
         blank=True,
         null=True,
-        validators=[FileExtensionValidator(allowed_extensions=['jpg']), validate_image_size]
+        validators=[validate_image_size]
                                 )
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

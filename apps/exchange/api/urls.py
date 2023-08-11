@@ -17,6 +17,8 @@ urlpatterns = [
     path('incoming-request/<int:pk>/', IncomingRequestsAPIView.as_view(), name='incoming-request'),
     path('my-books/', MyBooksAPIView.as_view(), name='my-books'),
     path('edit-my-book/<int:pk>/', EditMyBookAPIView.as_view(), name='edit-my-book'),
-    path('all-books-user/<int:pk>/', UserBooksAPIView.as_view(), name='user-books')
+    path('all-books-user/<int:pk>/', UserBooksAPIView.as_view(), name='user-books'),
+    path('my-books/', MyBooksListView.as_view(), name='my-books-list'),
+    path('my-books/<int:pk>/', MyBooksDetailView.as_view(), name='my-books-detail'),
 
 ]

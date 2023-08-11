@@ -8,6 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.contrib.auth import get_user_model
 from .permissions import *
+from rest_framework.permissions import IsAuthenticated
 
 
 User = get_user_model()
@@ -118,3 +119,22 @@ class UserBooksAPIView(generics.RetrieveAPIView):
     queryset = User.objects.all().prefetch_related('owned_books')
     serializer_class = UserBooksSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class MyBooksListView(generics.ListCreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
+
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class MyBooksDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Book.objects.filter(user=self.request.user)
