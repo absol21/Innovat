@@ -118,3 +118,73 @@ class UserBooksAPIView(generics.RetrieveAPIView):
     queryset = User.objects.all().prefetch_related('owned_books')
     serializer_class = UserBooksSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+
+class DeclineRequestAPIView(generics.UpdateAPIView,
+                            generics.RetrieveAPIView):
+    queryset = Request.objects.all().prefetch_related('requsted_books', 'sent_books')
+    serializer_class = IncomingRequestsSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_declined = True
+        instance.is_waiting = False
+        instance.save()
+        return response.Response({"message": f"You declined request from user {instance.send_by.username}!"})
+    
+
+class AcceptRequestAPIView(generics.UpdateAPIView,
+                           generics.RetrieveAPIView):
+    queryset = Request.objects.all().prefetch_related('sent_books', 'sent_to')
+    serializer_class = IncomingRequestsSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_accepted = True
+        instance.is_waiting = False
+        instance.save()
+        return response.Response({"message": f"You accepted request from user {instance.send_by.username}!"})
+    
+
+class CancelRequestAPIView(generics.RetrieveAPIView,
+                           generics.UpdateAPIView):
+    queryset = Request.objects.all().prefetch_related('sent_books', 'sent_to')
+    serializer_class = IncomingRequestsSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_accepted = False
+        instance.is_agreed = False
+        instance.is_canceled = True
+        instance.save()
+        return response.Response({"message": f"You canceled request from user {instance.send_by.username}!"}) 
+    
+
+
+#Подтверждение согласии место и время обмена
+class ConfirmRequestAPIView(generics.RetrieveAPIView,
+                            generics.UpdateAPIView):
+    queryset = Request.objects.all().prefetch_related('sent_books', 'sent_to')
+    serializer_class = IncomingRequestsSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_accepted = False
+        instance.is_agreed = True
+        instance.save()
+        return response.Response({"message": f"You confirmed agreement with user {instance.send_by.username}!"}) 
+    
+
+#Подтверждение завершении обмена
+class CompleteRequestAPIView(generics.RetrieveAPIView,
+                             generics.UpdateAPIView):
+    queryset = Request.objects.all().prefetch_related('sent_books', 'sent_to')
+    serializer_class = IncomingRequestsSerializer
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_agreed = False
+        instance.is_completed = True
+        instance.save()
+        return response.Response({"message": f"You confirmed completion of the exchange with user {instance.send_by.username}!"}) 
