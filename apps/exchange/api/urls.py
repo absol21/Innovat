@@ -2,7 +2,6 @@ from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from apps.exchange.api.views import *
 
-
 router = DefaultRouter()
 
 urlpatterns = [
@@ -18,5 +17,4 @@ urlpatterns = [
     path('my-books/', MyBooksAPIView.as_view(), name='my-books'),
     path('edit-my-book/<int:pk>/', EditMyBookAPIView.as_view(), name='edit-my-book'),
     path('all-books-user/<int:pk>/', UserBooksAPIView.as_view(), name='user-books')
-
 ]

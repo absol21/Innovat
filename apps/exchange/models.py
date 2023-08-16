@@ -53,7 +53,6 @@ class Book(models.Model):
         upload_to=get_path_upload_book,
         blank=True,
         null=True,
-        validators=[FileExtensionValidator(allowed_extensions=['jpg']), validate_image_size]
     )
 
     def __str__(self) -> str:

@@ -78,10 +78,12 @@ class AddBookSerializer(serializers.ModelSerializer):
             owner = user,
             title = validated_data['title'],
             status = validated_data['status'],
-            image = validated_data['image'],
             language = language,
             author = author,
         )
+        if 'image' in validated_data:
+            book.image = validated_data['image']
+
         book.save()
         for i in validated_data['genre']:
             book.genre.add(i)
