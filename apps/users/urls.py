@@ -1,6 +1,6 @@
 from django.urls import path
 # from .views import google_login, google_auth
-from .views import ChangePasswordView,ForgotPasswordView,ForgotPasswordCompleteView, RegisterView, ActivationView
+from .views import ChangePasswordView, ForgotPasswordView, ForgotPasswordCompleteView, RegisterView, ActivationView, user_profile
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView,)
 
 urlpatterns = [
@@ -13,4 +13,5 @@ urlpatterns = [
     path('forgot_password/', ForgotPasswordView.as_view(), name='forgot_password'),
     # path('google/', google_auth),
     # path('', google_login),
+    path('user/<str:username>/', user_profile, name='user_profile'),
 ]

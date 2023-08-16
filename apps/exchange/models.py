@@ -2,16 +2,17 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from base.services import get_path_upload_book, validate_image_size
 from django.core.validators import FileExtensionValidator
-
+from django.apps import apps
 
 User = get_user_model()
+
 
 class Author(models.Model):
     name = models.CharField(max_length=60)
 
     def __str__(self) -> str:
         return self.name
-    
+
     class Meta:
         ordering = ['-name']
 
@@ -58,10 +59,10 @@ class Book(models.Model):
 
     def __str__(self) -> str:
         return self.title
-    
+
     class Meta:
         ordering = ['-title', 'owner']
-    
+
 
 class Request(models.Model):
     sent_books = models.ManyToManyField(Book, related_name='sent_books')
@@ -78,9 +79,10 @@ class Request(models.Model):
 
     def __str__(self) -> str:
         return self.send_by.username
-    
+
     class Meta:
         ordering = ['-id']
+
 
 class Rating(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings_given')
@@ -89,7 +91,7 @@ class Rating(models.Model):
 
     def __str__(self):
         return f'{self.rating} -> {self.user}'
-    
+
     # def __str__(self) -> str:
     #     return self.books
 

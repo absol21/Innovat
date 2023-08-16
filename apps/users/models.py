@@ -1,8 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, User
 from django.utils.crypto import get_random_string
 from base.services import get_path_upload_avatar, validate_image_size
 from django.core.validators import FileExtensionValidator
+
+from main import settings
 
 
 class UserManager(BaseUserManager):
@@ -28,7 +30,13 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
+class Rating(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+
+
 class User(AbstractBaseUser):
+
     username = models.CharField(max_length=60)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=12, blank=True, null=True)
@@ -39,6 +47,7 @@ class User(AbstractBaseUser):
         null=True,
         validators=[validate_image_size]
                                 )
+    user_rating = models.OneToOneField(Rating, on_delete=models.CASCADE, related_name='user_rating')
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=10, blank=True)
@@ -61,3 +70,10 @@ class User(AbstractBaseUser):
         code = get_random_string(length=10, allowed_chars='0123456789')
         self.activation_code = code
         self.save()
+
+
+
+
+
+
+

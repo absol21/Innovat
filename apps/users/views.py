@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from . import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from .google import check_google_auth
-
+from ..exchange.models import Rating
 
 '''Google views'''
 def google_login(request):
@@ -75,3 +75,18 @@ class ForgotPasswordCompleteView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.set_new_password()
             return Response('Пароль успешно изменен')
+
+def user_profile(request, username):
+    user = User.objects.get(username=username)
+    user_rating_obj, created = Rating.objects.get_or_create(user=user)
+
+    context = {
+        'user': user,
+        'user_rating': user_rating_obj
+    }
+
+    return render(request, '', context)
+
+
+
+
