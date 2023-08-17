@@ -43,6 +43,7 @@ class Book(models.Model):
     genre = models.ManyToManyField(Genre, related_name='book_genre')
     language = models.ForeignKey(Language, on_delete=models.CASCADE, related_name='book_language')
     is_available = models.BooleanField(default=True)
+    description = models.TextField(blank=True, null=True)
 
     statuses = [
         ('Б/у', 'Б/у'),
