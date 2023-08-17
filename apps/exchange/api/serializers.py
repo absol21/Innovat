@@ -54,7 +54,7 @@ class AddBookSerializer(serializers.ModelSerializer):
     language = serializers.CharField()
     class Meta:
         model = Book
-        fields = ['title', 'status', 'image', 'author', 'language', 'genre']
+        fields = ['title', 'status', 'image', 'author', 'language', 'genre', 'description']
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -81,6 +81,7 @@ class AddBookSerializer(serializers.ModelSerializer):
             image = validated_data['image'],
             language = language,
             author = author,
+            description = validated_data['description']
         )
         book.save()
         for i in validated_data['genre']:
