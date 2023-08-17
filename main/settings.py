@@ -93,7 +93,7 @@ DATABASES = {
         'USER': config('DB_USER'),
         'HOST': 'localhost',
         'PORT': 5432
-    }
+        }
 }
 
 # Password validation
