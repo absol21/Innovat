@@ -39,7 +39,7 @@ class BookSerializer(serializers.ModelSerializer):
 class BookDetailUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'phone_number', 'location', 'avatar']
+        fields = ['id', 'username', 'number', 'city', 'avatar']
     
 
 class BookDetailSerializer(serializers.ModelSerializer):
@@ -180,4 +180,4 @@ class UserBooksSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'phone_number', 'location', 'avatar', 'owned_books']
+        fields = ['id', 'username', 'number', 'city', 'avatar', 'owned_books']
