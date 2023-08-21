@@ -128,7 +128,90 @@ class ForgotPasswordCompleteView(APIView):
 from rest_framework.viewsets import ModelViewSet
 from .serializers import Rating, RatingSerializer
 from rest_framework import permissions
-class RatingView(ModelViewSet):
-    queryset = Rating.objects.all()
-    serializer_class = RatingSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+# class RatingView(ModelViewSet):
+#     queryset = Rating.objects.all()
+#     serializer_class = RatingSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+
+
+# class RatingViewApi(APIView):
+#     def get(self, request):
+#         author = request.author
+#         rating = Rating.objects.all(author=author, username=request.username, rating=request.rating)
+#         if not rating:
+#             return Response("you didn't rated this user")
+#         else:
+#             return rating
+
+#     def post(self, request):
+#         serializer = RatingSerializer(data=request.data)
+#         if serializer.is_valid(raise_exception=True):
+#             serializer.save()
+#         return Response('raited', 200)
+    
+#     def patch(self, request):
+#         data = request.data
+#         serializer = RatingSerializer(data=data)
+#         if serializer.is_valid(raise_exception=True):
+#             serializer.save()
+#         return Response('Successfully edited', 201)
+    
+#     def delete(self, request):
+#         author = request.author
+#         rating = Rating.objects.get(author=author, rating=request.rating, username=request.username)
+#         if rating:
+#             rating.delete()
+#         else:
+#             return Response("You did't ratetd this user")
+
+
+class RatingViewApi(APIView):
+    def post(self, request):
+        serializer = RatingSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Rated successfully", status=201)
+        return Response(serializer.errors, status=201)
+
+    def patch(self, request):
+        user = request.user
+        username = request.data.get('username')
+        
+        try:
+            rating = Rating.objects.get(author=user, username=username)
+        except Rating.DoesNotExist:
+            return Response("You haven't rated this user yet", status=401)
+
+        serializer = RatingSerializer(rating, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response("Rating updated successfully", status=200)
+        return Response(serializer.errors, status=401)
+
+    def delete(self, request):
+        user = request.user
+        username = request.data.get('username')
+
+        try:
+            rating = Rating.objects.get(author=user, username=username)
+        except Rating.DoesNotExist:
+            return Response("You haven't rated this user yet", status=404)
+
+        rating.delete()
+        return Response("Rating deleted successfully", status=204)
+
+    def get(self, request):
+        user = request.user
+        username = request.query_params.get('username')
+
+        try:
+            rating = Rating.objects.get(author=user, username=username)
+        except Rating.DoesNotExist:
+            return Response("You haven't rated this user yet", status=404)
+
+        serializer = RatingSerializer(rating)
+        return Response(serializer.data, status=200)
