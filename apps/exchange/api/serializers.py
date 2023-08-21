@@ -39,7 +39,7 @@ class BookSerializer(serializers.ModelSerializer):
 class BookDetailUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'phone_number', 'location', 'avatar']
+        fields = ['id', 'username', 'number', 'city', 'avatar']
     
 
 class BookDetailSerializer(serializers.ModelSerializer):
@@ -94,6 +94,9 @@ class AddBookSerializer(serializers.ModelSerializer):
             description = validated_data['description'],
             condition = validated_data['condition']
         )
+        if 'image' in validated_data:
+            book.image = validated_data['image']
+
         book.save()
         
         return book
@@ -196,4 +199,4 @@ class UserBooksSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'phone_number', 'location', 'avatar', 'owned_books']
+        fields = ['id', 'username', 'number', 'city', 'avatar', 'owned_books']

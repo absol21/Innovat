@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.crypto import get_random_string
 from base.services import get_path_upload_avatar, validate_image_size
-from django.core.validators import FileExtensionValidator
+# from django.core.validators import FileExtensionValidator
 
 
 class UserManager(BaseUserManager):
@@ -29,15 +29,15 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser):
-    username = None
+    username = models.CharField(max_length=60, unique=True)
     email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=12, blank=True, null=True)
-    location = models.CharField(max_length=60, blank=True, null=True)
+    number = models.CharField(max_length=12, blank=True, null=True)
+    city = models.CharField(max_length=60,)
     avatar = models.ImageField(
         upload_to=get_path_upload_avatar,
         blank=True,
         null=True,
-        validators=[FileExtensionValidator(allowed_extensions=['jpg']), validate_image_size]
+        validators=[validate_image_size]
                                 )
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
@@ -61,3 +61,12 @@ class User(AbstractBaseUser):
         code = get_random_string(length=10, allowed_chars='0123456789')
         self.activation_code = code
         self.save()
+
+
+class Rating(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings_given')
+    rating = models.PositiveSmallIntegerField()
+    username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings_recieved', to_field='username')
+
+    def __str__(self):
+        return f'{self.rating} -> {self.user}'

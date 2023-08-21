@@ -2,15 +2,44 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from .tasks import send_activation_code_celery
+from .models import Rating
 
 User = get_user_model()
 
 
-class GoogleAuth(serializers.Serializer):
-    '''Сериализация данных от Google'''
-    email = serializers.EmailField()
-    token = serializers.CharField()
+class EditAvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['avatar']
 
+
+class EditProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'city', 'number')
+
+
+class RatingSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.email')
+
+    class Meta:
+        model = Rating
+        fields = ['rating', 'username', 'author']
+
+    def validate_rating(self, rating):
+        if rating not in range(1, 6):
+            raise serializers.ValidationError('Rating must be in the range 1 - 5')
+        return rating
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        rating = Rating.objects.create(author=user, **validated_data)
+
+        if user == rating.username:  
+            raise serializers.ValidationError('You cannot rate yourself.')
+
+        return rating
+from django.db.models import Avg
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(min_length=4, required=True, write_only=True)
@@ -18,7 +47,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'password_confirm')
+        fields = ('email', 'password', 'password_confirm', 'username', 'number', 'city', 'avatar')
 
     def validate(self, attrs):
         password = attrs.get("password")
@@ -31,6 +60,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         send_activation_code_celery(user.email, user.activation_code)
         return user
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['rating_avg'] = instance.ratings.aggregate(Avg('rating'))['rating__avg']
+        return representation
+
+    
+
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(min_length=4, required=True)
@@ -109,12 +146,10 @@ class ForgotPasswordCompleteSerializer(serializers.Serializer):
                 'Пользователь не найден'
             )
         
-        
         if password != password_confirm:
             raise serializers.ValidationError(
                'Пароли не совпадают' 
             )
-        
         return data
     
     def set_new_password(self):

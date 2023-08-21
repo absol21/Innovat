@@ -1,30 +1,78 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
-from .serializers import RegisterSerializer,ChangePasswordSerializer,ForgotPasswordSerializer,ForgotPasswordCompleteSerializer
+
+from .serializers import (
+    RegisterSerializer,
+    ChangePasswordSerializer,
+    ForgotPasswordSerializer,
+    ForgotPasswordCompleteSerializer, 
+    EditAvatarSerializer, 
+    EditProfileSerializer
+    )
 from .models import User
 from .permissions import IsActivePermissions
+
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from . import serializers
-from rest_framework.exceptions import AuthenticationFailed
-from .google import check_google_auth
+
+from rest_framework.parsers import MultiPartParser
 
 
-'''Google views'''
-def google_login(request):
-    """страница входа через Google"""
-    return render(request, 'templates/google_login.html')
+# from . import serializers
+# from rest_framework.exceptions import AuthenticationFailed
+# from .google import check_google_auth
 
-@api_view(["POST"])
-def google_auth(request):
-    '''Подтверждение авторизации через Google'''
-    google_data = serializers.GoogleAuth(data=request.data)
-    if google_data.is_valid():
-        token = check_google_auth(google_data.data)
-        return Response(token)
-    else:
-        return Response({'error': 'bad data Google'}, status=403)
+from base.services import validate_image_size
+    
+
+class EditAvatarView(APIView):
+    parser_classes = [MultiPartParser]
+
+    @swagger_auto_schema(request_body=EditAvatarSerializer())
+    def patch(self, request):
+        data = request.data
+        avatar_file = data['avatar']
+        serializer = EditAvatarSerializer(data=data)
+
+        if avatar_file:
+            validate_image_size(avatar_file)
+
+        if serializer.is_valid(raise_exception=True):
+            user = request.user  # Получаем текущего пользователя
+            if user.avatar:
+                user.avatar.delete()  # Удаляем старый аватар, если есть
+            user.avatar = avatar_file  # Устанавливаем новый аватар
+            user.save()  # Сохраняем пользователя
+
+            return Response('Аватар изменен', status=201)
+        else:
+            return Response(serializer.errors, status=400)
+       
+
+
+class EditProfileView(APIView):
+    @swagger_auto_schema(request_body=EditProfileSerializer())
+    def patch(self, request):
+        data = request.data
+        serializer = EditProfileSerializer(data=data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response('Successfully edited', 201)
+
+# '''Google views'''
+# def google_login(request):
+#     """страница входа через Google"""
+#     return render(request, 'templates/google_login.html')
+
+# @api_view(["POST"])
+# def google_auth(request):
+#     '''Подтверждение авторизации через Google'''
+#     google_data = serializers.GoogleAuth(data=request.data)
+#     if google_data.is_valid():
+#         token = check_google_auth(google_data.data)
+#         return Response(token)
+#     else:
+#         return Response({'error': 'bad data Google'}, status=403)
 
 
 
@@ -75,3 +123,12 @@ class ForgotPasswordCompleteView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.set_new_password()
             return Response('Пароль успешно изменен')
+        
+
+from rest_framework.viewsets import ModelViewSet
+from .serializers import Rating, RatingSerializer
+from rest_framework import permissions
+class RatingView(ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
+    permission_classes = [permissions.IsAuthenticated]
