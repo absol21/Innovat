@@ -40,7 +40,7 @@ class Book(models.Model):
     title = models.CharField(max_length=100)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_books')
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='book_author')
-    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, related_name='book_genre')
+    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, related_name='book_genre')
     language = models.ForeignKey(Language, on_delete=models.CASCADE, related_name='book_language')
     
     status = [('одобрено', 'Одобрено'),
