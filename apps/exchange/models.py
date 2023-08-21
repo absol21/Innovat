@@ -43,11 +43,11 @@ class Book(models.Model):
     genre = models.ManyToManyField(Genre, related_name='book_genre')
     language = models.ForeignKey(Language, on_delete=models.CASCADE, related_name='book_language')
     
-    status = [('Одобрено', 'Одобрено'),
-              ('Рассматривается', 'Рассматривается'),
-              ('Отказано', 'Отказано'),
+    status = [('одобрено', 'Одобрено'),
+              ('рассматривается', 'Рассматривается'),
+              ('доступно', 'Доступно'),
               ]
-    status = models.CharField(max_length=15, choices=status)
+    status = models.CharField(max_length=15, choices=status, default='доступно')
 
     description = models.TextField(blank=True, null=True)
 

@@ -54,7 +54,7 @@ class AddBookSerializer(serializers.ModelSerializer):
     language = serializers.CharField()
     class Meta:
         model = Book
-        fields = ['title', 'status', 'condition', 'image', 'author', 'language', 'genre', 'description']
+        fields = ['title', 'condition', 'image', 'author', 'language', 'genre', 'description']
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -77,7 +77,6 @@ class AddBookSerializer(serializers.ModelSerializer):
         book = Book(
             owner = user,
             title = validated_data['title'],
-            status = validated_data['status'],
             image = validated_data['image'],
             language = language,
             author = author,
@@ -96,14 +95,14 @@ class SentBooksPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         current_user = self.context['request'].user
         queryset = super().get_queryset()
-        return queryset.filter(owner=current_user)
+        return queryset.filter(owner=current_user).exclude(status='одобрено')
     
 
 class RequestedBooksPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):
         current_object = self.context['view'].get_object()
         queryset = super().get_queryset()
-        return queryset.filter(owner=current_object)
+        return queryset.filter(owner=current_object).exclude(status='одобрено')
 
 
 class SendRequestSerializer(serializers.ModelSerializer):
@@ -127,11 +126,13 @@ class SendRequestSerializer(serializers.ModelSerializer):
         )
         request.save()
 
-        for books in sent_books:
-            request.sent_books.add(books)
+        for book in sent_books:
+            request.sent_books.add(book)
+            book.status = 'рассматривается'
+            book.save()
 
-        for books in requested_books:
-            request.requested_books.add(books)
+        for book in requested_books:
+            request.requested_books.add(book)
 
         return request
     
@@ -167,6 +168,14 @@ class IncomingRequestsSerializer(serializers.ModelSerializer):
 
 
 class MyBooksSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True)
+    class Meta:
+        model = Book
+        fields = '__all__'
+        read_only_fields = ['owner']
+
+
+class EditMyBookSerilizer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = '__all__'
