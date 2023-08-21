@@ -110,7 +110,7 @@ class EditMyBookAPIView(generics.RetrieveAPIView,
                         generics.UpdateAPIView,
                         generics.DestroyAPIView):
     queryset = Book.objects.all()
-    serializer_class = MyBooksSerializer
+    serializer_class = EditMyBookSerilizer
     permission_classes = [IsOwner]
 
 
@@ -131,6 +131,11 @@ class DeclineRequestAPIView(generics.UpdateAPIView,
         instance.is_declined = True
         instance.is_waiting = False
         instance.save()
+
+        for book in instance.sent_books.all():
+            book.status = 'доступно'
+            book.save()
+            
         return response.Response({"message": f"You declined request from user {instance.send_by.username}!"})
     
 
@@ -144,6 +149,15 @@ class AcceptRequestAPIView(generics.UpdateAPIView,
         instance.is_accepted = True
         instance.is_waiting = False
         instance.save()
+
+        for book in instance.sent_books.all():
+            book.status = 'одобрено'
+            book.save()
+        
+        for book in instance.requested_books.all():
+            book.status = 'одобрено'
+            book.save()
+
         return response.Response({"message": f"You accepted request from user {instance.send_by.username}!"})
     
 
@@ -158,6 +172,15 @@ class CancelRequestAPIView(generics.RetrieveAPIView,
         instance.is_agreed = False
         instance.is_canceled = True
         instance.save()
+
+        for book in instance.sent_books.all():
+            book.status = 'доступно'
+            book.save()
+        
+        for book in instance.requested_books.all():
+            book.status = 'доступно'
+            book.save()
+
         return response.Response({"message": f"You canceled request from user {instance.send_by.username}!"}) 
     
 

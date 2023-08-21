@@ -40,22 +40,16 @@ class Book(models.Model):
     title = models.CharField(max_length=100)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_books')
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='book_author')
-    genre = models.ManyToManyField(Genre, related_name='book_genre')
+    genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, related_name='book_genre')
     language = models.ForeignKey(Language, on_delete=models.CASCADE, related_name='book_language')
     
-    status = [('Одобрено', 'Одобрено'),
-              ('Рассматривается', 'Рассматривается'),
-              ('Отказано', 'Отказано'),
+    status = [('одобрено', 'Одобрено'),
+              ('рассматривается', 'Рассматривается'),
+              ('доступно', 'Доступно'),
               ]
-    status = models.CharField(max_length=15, choices=status)
-
+    status = models.CharField(max_length=15, choices=status, default='доступно')
     description = models.TextField(blank=True, null=True)
-
-    condition = [
-        ('Б/у', 'Б/у'),
-        ('Новый', 'Новый'),
-    ]
-    condition = models.CharField(max_length=5, choices=condition)
+    condition = models.CharField(max_length=25)
     
     image = models.ImageField(
         upload_to=get_path_upload_book,
