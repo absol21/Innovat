@@ -48,14 +48,8 @@ class Book(models.Model):
               ('доступно', 'Доступно'),
               ]
     status = models.CharField(max_length=15, choices=status, default='доступно')
-
     description = models.TextField(blank=True, null=True)
-
-    condition = [
-        ('Б/у', 'Б/у'),
-        ('Новый', 'Новый'),
-    ]
-    condition = models.CharField(max_length=5, choices=condition)
+    condition = models.CharField(max_length=25)
     
     image = models.ImageField(
         upload_to=get_path_upload_book,
