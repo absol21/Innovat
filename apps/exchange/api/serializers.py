@@ -52,6 +52,7 @@ class BookDetailSerializer(serializers.ModelSerializer):
 class AddBookSerializer(serializers.ModelSerializer):
     author = serializers.CharField()
     language = serializers.CharField()
+    genre = serializers.CharField()
     class Meta:
         model = Book
         fields = ['title', 'condition', 'image', 'author', 'language', 'genre', 'description']
@@ -74,18 +75,26 @@ class AddBookSerializer(serializers.ModelSerializer):
             )
             language.save()
 
+        
+        if Genre.objects.filter(title=validated_data['genre']).exists():
+            genre = Genre.objects.get(title=validated_data['genre'])
+        else:
+            genre = Genre(
+                title = validated_data['genre']
+            )
+            genre.save()
+
         book = Book(
             owner = user,
             title = validated_data['title'],
             image = validated_data['image'],
             language = language,
             author = author,
+            genre = genre,
             description = validated_data['description'],
             condition = validated_data['condition']
         )
         book.save()
-        for i in validated_data['genre']:
-            book.genre.add(i)
         
         return book
     
