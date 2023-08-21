@@ -19,6 +19,9 @@ class EditProfileSerializer(serializers.ModelSerializer):
         fields = ('username', 'city', 'number')
 
 
+from rest_framework import serializers
+from .models import Rating
+
 class RatingSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.email')
 
@@ -33,13 +36,21 @@ class RatingSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
+        username = validated_data.get('username')
+
+        existing_rating = Rating.objects.filter(author=user, username=username).first()
+
+        if existing_rating:
+            raise serializers.ValidationError('You have already rated this user')
+
         rating = Rating.objects.create(author=user, **validated_data)
 
-        if user == rating.username:  
+        if user == rating.username:
             raise serializers.ValidationError('You cannot rate yourself.')
 
         return rating
 from django.db.models import Avg
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(min_length=4, required=True, write_only=True)
