@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.crypto import get_random_string
 from base.services import get_path_upload_avatar, validate_image_size
-# from django.core.validators import FileExtensionValidator
 
 
 class UserManager(BaseUserManager):
@@ -28,6 +27,7 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
+
 class User(AbstractBaseUser):
     username = models.CharField(max_length=60, unique=True)
     email = models.EmailField(unique=True)
@@ -38,7 +38,7 @@ class User(AbstractBaseUser):
         blank=True,
         null=True,
         validators=[validate_image_size]
-                                )
+    )
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=10, blank=True)
@@ -46,7 +46,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self) -> str:
         return f'{self.email} -> {self.id}'
