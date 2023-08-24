@@ -87,20 +87,23 @@ class AddBookSerializer(serializers.ModelSerializer):
         book = Book(
             owner = user,
             title = validated_data['title'],
-            image = validated_data['image'],
             language = language,
             author = author,
             genre = genre,
-            description = validated_data['description'],
-            condition = validated_data['condition']
+            condition = validated_data['condition'],
+            image = validated_data['image'],
+            description = validated_data['description']
         )
         if 'image' in validated_data:
             book.image = validated_data['image']
 
+        if 'description' in validated_data:
+            book.description = validated_data['description']
+
         book.save()
+        print(book)
         
         return book
-    
 
 
 class SentBooksPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
