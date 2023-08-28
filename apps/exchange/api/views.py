@@ -29,7 +29,6 @@ class BookApiView(generics.ListAPIView):
         return response.Response(serializer.data)
     
 
-
 class BookDetailAPIView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookDetailSerializer
@@ -197,7 +196,7 @@ class ConfirmRequestAPIView(generics.RetrieveAPIView,
         instance.is_agreed = True
         instance.save()
         return response.Response({"message": f"You confirmed agreement with user {instance.send_by.username}!"}) 
-    
+
 
 #Подтверждение завершении обмена
 class CompleteRequestAPIView(generics.RetrieveAPIView,
@@ -210,4 +209,4 @@ class CompleteRequestAPIView(generics.RetrieveAPIView,
         instance.is_agreed = False
         instance.is_completed = True
         instance.save()
-        return response.Response({"message": f"You confirmed completion of the exchange with user {instance.send_by.username}!"}) 
+        return response.Response({"message": f"You confirmed completion of the exchange with user {instance.send_by.username}!"})

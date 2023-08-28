@@ -7,16 +7,27 @@ from .models import Rating
 User = get_user_model()
 
 
-class EditAvatarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['avatar']
-
-
 class EditProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'city', 'number')
+
+
+class EditAvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['avatar',]
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        user.avatar.delete() 
+        user.avatar = self.validated_data['avatar']
+        user.save()
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'username', 'city', 'number', 'avatar')
 
 
 class RatingSerializer(serializers.ModelSerializer):
@@ -33,13 +44,22 @@ class RatingSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
+        username = validated_data.get('username')
+
+        existing_rating = Rating.objects.filter(author=user, username=username).first()
+
+        if existing_rating:
+            raise serializers.ValidationError('You have already rated this user')
+
         rating = Rating.objects.create(author=user, **validated_data)
 
-        if user == rating.username:  
+        if user == rating.username:
             raise serializers.ValidationError('You cannot rate yourself.')
 
         return rating
+    
 from django.db.models import Avg
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(min_length=4, required=True, write_only=True)
@@ -65,8 +85,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['rating_avg'] = instance.ratings.aggregate(Avg('rating'))['rating__avg']
         return representation
-
-    
 
 
 class ChangePasswordSerializer(serializers.Serializer):

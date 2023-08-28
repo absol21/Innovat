@@ -3,8 +3,8 @@ from django.core.exceptions import ValidationError
 def get_path_upload_avatar(instance, filename):
     return f'avatar/{instance.id}/{filename}'
 
-def get_path_upload_book(instance, file):
-    return f'avatar/{instance.user.id}/{file}/'
+def get_path_upload_book(instance, filename):
+    return f'books/{filename}'
 
 def validate_image_size(file_obj):
     megabyte_limit = 2
