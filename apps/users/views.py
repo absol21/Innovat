@@ -15,6 +15,17 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from rest_framework.views import APIView
 from rest_framework import generics
+from rest_framework import permissions
+
+
+
+class MyProfileAPIView(generics.ListAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(username=self.request.user)
+    
 
 class ProfileView(generics.RetrieveAPIView):
     queryset = User.objects.all()

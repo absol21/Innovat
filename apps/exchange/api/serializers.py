@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class BookSerializer(serializers.ModelSerializer):
     language = serializers.SerializerMethodField(method_name='get_language')
-    genre = GenreSerializer(many=True, allow_null=True)
+    genre = GenreSerializer()
     author = serializers.SerializerMethodField(method_name='get_author')
     owner = UserSerializer()
 
@@ -183,7 +183,7 @@ class IncomingRequestsSerializer(serializers.ModelSerializer):
 
 
 class MyBooksSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True)
+    genre = GenreSerializer()
     class Meta:
         model = Book
         fields = '__all__'

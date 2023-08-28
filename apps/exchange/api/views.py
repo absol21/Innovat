@@ -15,18 +15,16 @@ User = get_user_model()
 
 
 class BookApiView(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     filterset_fields = ['genre', 'author', 'language'] 
     search_fields = ['title', 'author__name']
+    serializer_class = BookSerializer
 
     def get_queryset(self):
-        return Book.objects.all()
-    
-    def list(self, request, *args, **kwargs):
-        current_user = request.user
-        queryset = self.get_queryset().exclude(owner=current_user)
-        serializer = BookSerializer(queryset, many=True)
-        return response.Response(serializer.data)
+        if self.request.user.is_authenticated:
+            return Book.objects.exclude(owner=self.request.user)
+        else:
+            return Book.objects.all()
     
 
 class BookDetailAPIView(generics.RetrieveAPIView):
