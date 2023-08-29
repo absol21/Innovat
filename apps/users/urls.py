@@ -8,6 +8,7 @@ from .views import (
         ActivationView, 
         EditProfileView, 
         EditAvatarView,
+        MyProfileAPIView,
         ProfileView,
         RatingViewApi
     )
@@ -18,7 +19,7 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('edit_profile/', EditProfileView.as_view(), name='edit-profile'),
     path('edit_avatar/', EditAvatarView.as_view(), name='edit-avatar'),
-    path('userpage/', ProfileView.as_view(), name='profile-list'),
+    path('userpage/', MyProfileAPIView.as_view(), name='profile-list'),
     path('userpage/<int:pk>/', ProfileView.as_view(), name='profile-detail'),
     path('ratings/', RatingViewApi.as_view(), name='ratings'),
     path('activate/<str:email>/<str:activation_code>/', ActivationView.as_view(), name='activate'),
