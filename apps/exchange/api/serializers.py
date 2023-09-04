@@ -20,13 +20,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 class BookSerializer(serializers.ModelSerializer):
     language = serializers.SerializerMethodField(method_name='get_language')
-    genre = GenreSerializer()
+    genre = serializers.SerializerMethodField(method_name='get_genre')
     author = serializers.SerializerMethodField(method_name='get_author')
     owner = UserSerializer()
 
     class Meta:
         model = Book
         fields = '__all__'
+        
+
+    def get_genre(self, obj):
+        return obj.genre.title
 
     def get_language(self, obj):
         language = obj.language.language
@@ -44,9 +48,22 @@ class BookDetailUserSerializer(serializers.ModelSerializer):
 
 class BookDetailSerializer(serializers.ModelSerializer):
     owner = BookDetailUserSerializer()
+    genre = serializers.SerializerMethodField(method_name='get_genre')
+    author = serializers.SerializerMethodField(method_name='get_author')
+    language = serializers.SerializerMethodField(method_name='get_language')
+    
     class Meta:
         model = Book
         fields = '__all__'
+
+    def get_genre(self, obj):
+        return obj.genre.title
+    
+    def get_author(self, obj):
+        return obj.author.name
+    
+    def get_language(self, obj):
+        return obj.language.language
 
 
 class AddBookSerializer(serializers.ModelSerializer):
