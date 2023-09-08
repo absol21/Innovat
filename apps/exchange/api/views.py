@@ -48,6 +48,12 @@ class SendRequestAPIView(generics.RetrieveAPIView,
             return UserSerializer
         elif self.request.method == 'POST':
             return SendRequestSerializer
+        
+
+class RequestSingleBookAPIView(generics.RetrieveAPIView, 
+                               generics.CreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = RequestSingleBookSerializer
 
     
 class MyRequestsAPIView(generics.ListAPIView):
@@ -120,7 +126,7 @@ class UserBooksAPIView(generics.RetrieveAPIView):
 
 class DeclineRequestAPIView(generics.UpdateAPIView,
                             generics.RetrieveAPIView):
-    queryset = Request.objects.all().prefetch_related('requsted_books', 'sent_books')
+    queryset = Request.objects.all().prefetch_related('requested_books', 'sent_books')
     serializer_class = IncomingRequestsSerializer
 
     def update(self, request, *args, **kwargs):

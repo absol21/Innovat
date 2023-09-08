@@ -8,3 +8,4 @@ class BookAdmin(admin.ModelAdmin):
 admin.site.register(models.Author)
 admin.site.register(models.Genre)
 admin.site.register(models.Language)
+admin.site.register(models.Request)
