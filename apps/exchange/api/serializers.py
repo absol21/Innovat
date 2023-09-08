@@ -169,6 +169,26 @@ class SendRequestSerializer(serializers.ModelSerializer):
         return request
     
 
+class RequestSingleBookSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Book
+        fields = '__all__'
+        read_only_fields = ['title', 'owner', 'author', 'genre', 'language', 'status', 'description', 'condition', 'image']
+
+
+    def create(self, validated_data):
+        book = self.context['view'].get_object()
+        request = Request(
+            sent_to = book.owner,
+            send_by = self.context['request'].user,
+            is_waiting = True
+        )
+        request.save()
+        request.requested_books.add(book)
+        return request
+    
+
 
 class MyRequestsSerializer(serializers.ModelSerializer):
     sent_books = BookSerializer(many=True, allow_null=True)

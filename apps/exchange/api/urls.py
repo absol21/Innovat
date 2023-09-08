@@ -10,6 +10,7 @@ urlpatterns = [
     path('add-book/', AddBookAPIView.as_view(), name='add-book'),
     path('book-detail/<int:pk>/', BookDetailAPIView.as_view(), name='book-detail'),
     path('send-request-user/<int:pk>/', SendRequestAPIView.as_view(), name='send-request'),
+    path('request-book/<int:pk>/', RequestSingleBookAPIView.as_view(), name='request-book'),
     path('my-requests/', MyRequestsAPIView.as_view(), name='my-requests'),
     path('edit-my-request/<int:pk>/', EditMyRequestsAPIView.as_view(), name='edit-my-request'),
     path('incoming-requests/', IncomingRequestsAPIView.as_view(), name='incoming-requests'),
